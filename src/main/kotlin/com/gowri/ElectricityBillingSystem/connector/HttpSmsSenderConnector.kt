@@ -1,5 +1,6 @@
 package com.gowri.ElectricityBillingSystem.connector
 
+
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
@@ -9,16 +10,9 @@ import com.gowri.ElectricityBillingSystem.connector.HttpConnector.Companion.CONT
 import org.apache.http.client.methods.HttpPost
 import org.apache.http.entity.StringEntity
 import org.apache.logging.log4j.LogManager
-
-
-import java.text.SimpleDateFormat
-import java.util.Date
-
-
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
-import java.util.logging.Logger
 
 interface HttpSmsSenderConnector {
     fun sendMessage(): JsonObject?
@@ -42,7 +36,8 @@ class HttpSmsSenderConnectorImpl : HttpSmsSenderConnector {
             val request = HttpPost(endpointUri)
             val jsonStr = Gson().toJson(LoraServerLogin("admin","admin"))
             request.entity = StringEntity(jsonStr)
-            request.addHeader("Accept", CONTENT_TYPE_APPLICATION_JSON)
+            request.addHeader(CONTENT_TYPE, CONTENT_TYPE_APPLICATION_JSON)
+            request.addHeader("Accept", "*/*")
 
             val response = httpConnector.sendRequest(request)
             if(response == null){

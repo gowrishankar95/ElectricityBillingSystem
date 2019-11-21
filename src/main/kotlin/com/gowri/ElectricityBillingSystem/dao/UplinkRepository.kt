@@ -1,6 +1,7 @@
 package com.gowri.ElectricityBillingSystem.dao
 
 import com.gowri.ElectricityBillingSystem.UplinkDataToDatabase
+import java.sql.Timestamp
 
 interface UplinkRepository {
     /**
@@ -13,6 +14,8 @@ interface UplinkRepository {
      * This is the method to be used to get the
      * last uploaded data to the databse. should provide devUI,
      */
-    abstract fun getUplinkData(devUI: String): String?
+    abstract fun getLastUplinkData(devUI: String): String?
+
+    abstract fun getFirstUplinkDataAfterGivenTimeStamp(devUI: String,timstamp: Timestamp): String?
 
 }

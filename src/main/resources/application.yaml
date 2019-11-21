@@ -13,3 +13,10 @@ lora:
     maxNoOfConnections: 50
     idleConnectionCheckPeriodInMilliSec: 10000
     maxIdleTimeInMilliSec: 600000
+
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/billingSystem
+    username: root
+    password:
+    driver-class-name:

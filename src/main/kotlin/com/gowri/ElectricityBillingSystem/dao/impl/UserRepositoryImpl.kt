@@ -7,7 +7,6 @@ import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.PreparedStatementCreator
-import org.springframework.jdbc.support.GeneratedKeyHolder
 import org.springframework.stereotype.Repository
 import java.sql.Connection
 import java.sql.PreparedStatement
@@ -16,14 +15,27 @@ import java.sql.SQLException
 @Repository
 public class UserRepositoryImpl: UserRepository {
 
+    override fun findByEmail(email: String): User? {
+        val sql = ("SELECT * "
+                + "FROM users" + " where email = " + "\'" + email + "\'")
+        val user = jdbcTemplate!!.query(sql, UserMapper())
+        if (user == null) {
+            logger.warn("user with user email {} does not exist", email)
+            return null
+        } else {
+            logger.warn("returning user")
+            return user[0]
+        }
+
+    }
+
     var logger = LoggerFactory.getLogger(this.javaClass)
 
     @Autowired
     private val jdbcTemplate: JdbcTemplate? = null
 
-    fun create(user: User): User {
-        val sql = "INSERT INTO users (userName,email,password,invalidLoginAttempt,accountNum,sessionTime,lastLoginTimestamp) VALUES (?, ?,?,?,?,?,?)"
-        val keyHolder = GeneratedKeyHolder()
+    override fun create(user: User): User {
+        val sql = "INSERT INTO User (userName,email,password,accountNum,devEUI) VALUES (?, ?,?,?,?)"
         jdbcTemplate!!.update(object : PreparedStatementCreator {
             @Throws(SQLException::class)
             override fun createPreparedStatement(connection: Connection): PreparedStatement {
@@ -31,10 +43,9 @@ public class UserRepositoryImpl: UserRepository {
                 ps.setString(1, user.username)
                 ps.setString(2, user.email)
                 ps.setString(3, user.password)
-                ps.setInt(4, user.invalidLoginAttempt)
-                ps.setString(5, user.accountNum)
-                ps.setTimestamp(6, user.sessionTime)
-                ps.setTimestamp(7, user.lastLoginTimestamp)
+                ps.setString(4, user.accountNum)
+                ps.setString(5, user.devEUI)
+
                 return ps
             }
         })
@@ -47,25 +58,20 @@ public class UserRepositoryImpl: UserRepository {
 //    fun deleteUser(id: Int): User? {
 //        val user = isIdExist(id)
 //        if (user == null) {
-//            logger.warn("User with id {} not found", id)
+//            logger.warn("user with user id {} does not exist", userId)
 //            return null
 //        } else {
-//            val sql = "DELETE  FROM users  WHERE UserId=?"
-//            jdbcTemplate!!.update(sql, id)
-//            println("user id $id deleted")
-//            logger.info("user succesfully deleted")
-//            return user
-//
+//            logger.warn("returning user")
+//            return user[0]
 //        }
-//    }
 //
-//    fun viewAllUsers(): List<User> {
+//    }
 //
 //        val sql = "SELECT UserId, userName, passowrd" + " FROM users"
 //        return jdbcTemplate!!.query(sql, UserMapper())
 //    }
 
-    fun getUser(userId: Int): User? {
+    override fun getUser(userId: Int): User? {
         val sql = ("SELECT * "
                 + "FROM users" + " where UserId = " + "\'" + userId + "\'")
         val user = jdbcTemplate!!.query(sql, UserMapper())
@@ -81,10 +87,24 @@ public class UserRepositoryImpl: UserRepository {
 
     override fun findByUsername(username: String): User? {
         val sql = ("SELECT * "
-                + "FROM users" + " where userName = " + "\'" + username + "\'")
+                + "FROM users" + " where username = " + "\'" + username + "\'")
         val user = jdbcTemplate!!.query(sql, UserMapper())
         if (user == null) {
             logger.warn("user with user id {} does not exist", username)
+            return null
+        } else {
+            logger.warn("returning user")
+            return user[0]
+        }
+
+    }
+
+    override fun findByAccountNum(accountNum: String): User? {
+        val sql = ("SELECT * "
+                + "FROM users" + " where accountNum = " + "\'" + accountNum + "\'")
+        val user = jdbcTemplate!!.query(sql, UserMapper())
+        if (user == null) {
+            logger.warn("user with user id {} does not exist", accountNum)
             return null
         } else {
             logger.warn("returning user")

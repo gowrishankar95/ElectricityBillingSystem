@@ -5,13 +5,13 @@ import org.springframework.jdbc.core.RowMapper
 import java.sql.ResultSet
 import java.sql.SQLException
 
-class UplinkMapper : RowMapper<UplinkDataToDatabase> {
+class UplinkMapper : RowMapper<getUplinkDataFromDatabase> {
 
     @Throws(SQLException::class)
-    override fun mapRow(resultSet: ResultSet, i: Int):UplinkDataToDatabase?{
+    override fun mapRow(resultSet: ResultSet, i: Int):getUplinkDataFromDatabase?{
         try {
 
-            val uplinkData = UplinkDataToDatabase(resultSet.getString("devEUI"),resultSet.getTimestamp(""),resultSet.getString("data"));
+            val uplinkData = getUplinkDataFromDatabase(resultSet.getString("devEUI"),resultSet.getTimestamp(""),resultSet.getString("data"));
 
             return uplinkData
 

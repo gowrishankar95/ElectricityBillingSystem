@@ -1,6 +1,5 @@
 package com.gowri.ElectricityBillingSystem
 
-import java.sql.Date
 import java.sql.Timestamp
 
 data class RecievedData(
@@ -16,6 +15,12 @@ data class RecievedData(
 )
 data class UplinkDataToDatabase(
         val devEUI: String,
+        //val uploadedTime: Timestamp,
+        val data:String
+)
+
+data class getUplinkDataFromDatabase(
+        val devEUI: String,
         val uploadedTime: Timestamp,
         val data:String
 )
@@ -29,9 +34,10 @@ data class User(
         val username: String,
         val email: String,
         val password: String,
-        val invalidLoginAttempt: Int,
-        val accountNum: String?,
-        val sessionTime: Timestamp?,
-        val lastLoginTimestamp: Timestamp?,
+        val accountNum: String,
+        val devEUI: String
+)
+
+data class getNumberOfUnitsConsumedForCurrentMonth(
         val devEUI: String
 )

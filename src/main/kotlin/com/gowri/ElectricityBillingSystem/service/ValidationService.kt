@@ -3,16 +3,13 @@ package com.gowri.ElectricityBillingSystem.service
 import com.gowri.ElectricityBillingSystem.ApiException
 import com.gowri.ElectricityBillingSystem.User
 import com.gowri.ElectricityBillingSystem.dao.UserRepository
-
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.security.crypto.factory.PasswordEncoderFactories
 import org.springframework.stereotype.Service
 import java.util.regex.Matcher
 import java.util.regex.Pattern
-import javax.xml.bind.DatatypeConverter
 
 
 //todo: java doc is needed
@@ -28,7 +25,7 @@ interface ValidationService {
     /**
      * Validate login Api
      */
-    fun validateLogin(username: String, passowrd: String)
+    //fun validateLogin(username: String, passowrd: String)
 
 }
 
@@ -59,47 +56,47 @@ class ValidationServiceImpl : ValidationService {
 
 
 
-    override fun validateLogin(username: String, passowrd: String) {
-        validateUsername(username)
-        val user = userRepository.findByUsername(username)
-        val userEmail = userRepository.findByEmail(username)
-
-        if (user == null && userEmail == null) {
-            throw ApiException(ErrorCode.INVALID_USERNAME.id, ErrorCode.INVALID_USERNAME.msg,
-                    "Error occurred while validating logged in [ username : $username ]")
-        }
-
-        if (user != null) {
-            validateUserAccount(user)
-            validateLoginPassword(user, passowrd)
-        } else if (userEmail != null) {
-            validateUserAccount(userEmail)
-            validateLoginPassword(userEmail, passowrd)
-        }
-    }
-
-    private fun validateLoginPassword(user: User, password: String) {
-        if (password.isEmpty() || ! PasswordEncoderFactories.createDelegatingPasswordEncoder()
-                        .matches(password, user.password))
-            if (user.tempPassword != null) {
-                if (! PasswordEncoderFactories
-                                .createDelegatingPasswordEncoder().matches(password, user.tempPassword)) {
-                    userRepository.updateInvalidLoginAtemps(user.username, user.invalidLoginAttempt + 1)
-                    throw ApiException(ErrorCode.INVALID_PASSWORD.id, ErrorCode.INVALID_PASSWORD.msg,
-                            "Error occurred while validating logged in user's password")
-                }
-            } else {
-                userRepository.updateInvalidLoginAtemps(user.username, user.invalidLoginAttempt + 1)
-                throw ApiException(ErrorCode.INVALID_PASSWORD.id, ErrorCode.INVALID_PASSWORD.msg,
-                        "Error occurred while validating logged in user's password")
-            }
-
-        if (! PasswordEncoderFactories.createDelegatingPasswordEncoder()
-                        .matches(password, user.password) &&
-                user.sessionTime != null && user.lastPwdResetTimestamp != null) {
-            validateTemPasTimestamp(user, user.sessionTime, user.lastPwdResetTimestamp)
-        }
-    }
+//    override fun validateLogin(username: String, passowrd: String) {
+//        validateUsername(username)
+//        val user = userRepository.findByUsername(username)
+//        val userEmail = userRepository.findByEmail(username)
+//
+//        if (user == null && userEmail == null) {
+//            throw ApiException(ErrorCode.INVALID_USERNAME.id, ErrorCode.INVALID_USERNAME.msg,
+//                    "Error occurred while validating logged in [ username : $username ]")
+//        }
+//
+//        if (user != null) {
+//            validateUserAccount(user)
+//            validateLoginPassword(user, passowrd)
+//        } else if (userEmail != null) {
+//            validateUserAccount(userEmail)
+//            validateLoginPassword(userEmail, passowrd)
+//        }
+//    }
+//
+//    private fun validateLoginPassword(user: User, password: String) {
+//        if (password.isEmpty() || ! PasswordEncoderFactories.createDelegatingPasswordEncoder()
+//                        .matches(password, user.password))
+//            if (user.tempPassword != null) {
+//                if (! PasswordEncoderFactories
+//                                .createDelegatingPasswordEncoder().matches(password, user.tempPassword)) {
+//                    userRepository.updateInvalidLoginAtemps(user.username, user.invalidLoginAttempt + 1)
+//                    throw ApiException(ErrorCode.INVALID_PASSWORD.id, ErrorCode.INVALID_PASSWORD.msg,
+//                            "Error occurred while validating logged in user's password")
+//                }
+//            } else {
+//                userRepository.updateInvalidLoginAtemps(user.username, user.invalidLoginAttempt + 1)
+//                throw ApiException(ErrorCode.INVALID_PASSWORD.id, ErrorCode.INVALID_PASSWORD.msg,
+//                        "Error occurred while validating logged in user's password")
+//            }
+//
+//        if (! PasswordEncoderFactories.createDelegatingPasswordEncoder()
+//                        .matches(password, user.password) &&
+//                user.sessionTime != null && user.lastPwdResetTimestamp != null) {
+//            validateTemPasTimestamp(user, user.sessionTime, user.lastPwdResetTimestamp)
+//        }
+//    }
 
 
     override fun validateRegistrationRequest(request: User) {
@@ -131,24 +128,10 @@ class ValidationServiceImpl : ValidationService {
         }
     }
 
-
-
-    fun validateUserAccount(user: User) {
-        if ((user.invalidLoginAttempt + 1) > maxInvalidLoginAttempt.toInt()) {
-            throw ApiException(ErrorCode.USER_ACCOUNT_LOCKED.id, ErrorCode.USER_ACCOUNT_LOCKED.msg,
-                    "Error occurred since account has locked more than $maxInvalidLoginAttempt")
-        }
-    }
-
-
-
-
-
     private fun validateAccountNum(accountNum: String) {
-        val isAccountNumExist = allowedServiceRepository.findByAccountName(accountNum)
-        val isUserAccountNumExist = userRepository.findByAccountNum(accountNum)
-        if (isAccountNumExist || isUserAccountNumExist) {
-            throw ApiException(ErrorCode.INVALID_ACCOUNTNUM.id, ErrorCode.INVALID_ACCOUNTNUM.msg,
+        val user = userRepository.findByAccountNum(accountNum)
+        if (user!=null) {
+            throw ApiException("1050", "account number already exists",
                     "Error occurred while validating  [ account number : $accountNum]")
         }
     }
@@ -165,16 +148,12 @@ class ValidationServiceImpl : ValidationService {
     }
 
     private fun validateEmail(email: String) {
-        val userEmail = userRepository.findByEmail(email)
-        if (email.isEmpty() || !validateEmailPattern(email).matches()) {
-            throw ApiException(ErrorCode.INVALID_EMAIL.id, ErrorCode.INVALID_EMAIL.msg,
+        val user = userRepository.findByEmail(email)
+        if (user != null) {
+            throw ApiException("1023", "email already exists",
                     "Error occurred while validating  [ email : $email ]")
         }
 
-        if(userEmail != null) {
-            throw ApiException(ErrorCode.USER_EMAIL_EXISTS.id, ErrorCode.USER_EMAIL_EXISTS.msg,
-                    "Error occurred while validating  [ email : $email ]")
-        }
     }
 
     private fun validateEmailPattern(email: String) : Matcher{

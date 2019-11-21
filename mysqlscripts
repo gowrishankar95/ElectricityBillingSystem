@@ -1,0 +1,4 @@
+create table  uplink (devEUI varchar(50) not null primary key,     data varchar(500),uploadedTime  timestamp not null default current_timestamp on update current_timestamp );
+
+create table  User (id INT not null primary key AUTO_INCREMENT, username varchar(500),email varchar(500),password varchar(500),accountNum varchar(500) ,devEUI varchar(50));
+

@@ -12,6 +12,7 @@ import org.springframework.stereotype.Repository
 import java.sql.Connection
 import java.sql.PreparedStatement
 import java.sql.SQLException
+import java.sql.Timestamp
 
 @Repository
 class UplinkRepositoryImpl : UplinkRepository {
@@ -23,15 +24,14 @@ class UplinkRepositoryImpl : UplinkRepository {
     private val jdbcTemplate: JdbcTemplate? = null
 
     override fun insertUplink(upLink: UplinkDataToDatabase): UplinkDataToDatabase                            {
-        val sql = "INSERT INTO uplink (devEUI,uploadedTime,data) VALUES (?, ?, ?)"
+        val sql = "INSERT INTO uplink (devEUI,data) VALUES (?, ?)"
         val keyHolder = GeneratedKeyHolder()
         jdbcTemplate!!.update(object : PreparedStatementCreator {
             @Throws(SQLException::class)
             override fun createPreparedStatement(connection: Connection): PreparedStatement {
                 val ps = connection.prepareStatement(sql)
                 ps.setString(1, upLink.devEUI)
-                ps.setTimestamp(2,upLink.uploadedTime)
-                ps.setString(3, upLink.data)
+                ps.setString(2, upLink.data)
                 return ps
             }
         })
@@ -40,9 +40,23 @@ class UplinkRepositoryImpl : UplinkRepository {
         return upLink
 
     }
-    override fun getUplinkData(devUI: String): String? {
+    override fun getLastUplinkData(devUI: String): String? {
         val sql = ("SELECT * "
-                + "FROM uplink" + " where devEUI = " + "\'" + devUI + "\'")
+                + "FROM uplink" + " where devEUI = " + "\'" + devUI + "\'"+ "ORDER BY uploadedTime DESC LIMIT 1")
+        val uplinkData = jdbcTemplate!!.query(sql, UplinkMapper())
+        if (uplinkData == null) {
+            logger.warn("devUI does not exist", devUI)
+            return null
+        } else {
+            logger.warn("returning user")
+            return uplinkData?.get(0).data
+        }
+
+    }
+
+    override fun getFirstUplinkDataAfterGivenTimeStamp(devUI: String,timstamp:Timestamp): String? {
+        val sql = ("SELECT * "
+                + "FROM uplink" + " where devEUI = " + "\'" + devUI + "\'"+" AND uploadedTime >"+ "\'" + timstamp  +"ORDER BY uploadedTime ASC LIMIT 1")
         val uplinkData = jdbcTemplate!!.query(sql, UplinkMapper())
         if (uplinkData == null) {
             logger.warn("devUI does not exist", devUI)
