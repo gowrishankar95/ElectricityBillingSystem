@@ -1,0 +1,15 @@
+
+#  SMS connector configuration properties
+lora:
+#  SMS MT send request endpoint
+  endpointUri: http://localhost:8080/api/internal/login
+  #  Username for the sms mt request
+
+  connector:
+    soTimeOutInMillis: 2000
+    connectionRequestTimeoutInMilliSec: 2000
+    connectTimeoutInMilliSec: 2000
+    defaultMaxNoOfConnectionsPerRoute: 50
+    maxNoOfConnections: 50
+    idleConnectionCheckPeriodInMilliSec: 10000
+    maxIdleTimeInMilliSec: 600000
