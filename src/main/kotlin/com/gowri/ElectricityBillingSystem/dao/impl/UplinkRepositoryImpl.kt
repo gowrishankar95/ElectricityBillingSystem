@@ -3,6 +3,7 @@ package com.gowri.ElectricityBillingSystem.dao.impl
 import com.gowri.ElectricityBillingSystem.UplinkDataToDatabase
 import com.gowri.ElectricityBillingSystem.UplinkMapper
 import com.gowri.ElectricityBillingSystem.dao.UplinkRepository
+import com.gowri.ElectricityBillingSystem.getUplinkDataFromDatabase
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.jdbc.core.JdbcTemplate
@@ -129,4 +130,12 @@ class UplinkRepositoryImpl : UplinkRepository {
 //            return "User Id $id password succesfully updated"
 //
 //        }
+
+    override fun getAllUplinkData(devUI: String): MutableList<getUplinkDataFromDatabase>? {
+
+        val sql = ("SELECT * "
+                + "FROM uplink" + " where devEUI = " + "\'" + devUI + "\'")
+        return jdbcTemplate?.query(sql, UplinkMapper())
+    }
+
 }

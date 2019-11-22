@@ -11,7 +11,7 @@ class UplinkMapper : RowMapper<getUplinkDataFromDatabase> {
     override fun mapRow(resultSet: ResultSet, i: Int):getUplinkDataFromDatabase?{
         try {
 
-            val uplinkData = getUplinkDataFromDatabase(resultSet.getString("devEUI"),resultSet.getTimestamp(""),resultSet.getString("data"));
+            val uplinkData = getUplinkDataFromDatabase(resultSet.getString("devEUI"),resultSet.getTimestamp("uploadedTime"),resultSet.getString("data"));
 
             return uplinkData
 

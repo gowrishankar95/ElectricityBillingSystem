@@ -1,9 +1,6 @@
 package com.gowri.ElectricityBillingSystem.service
 
-import com.gowri.ElectricityBillingSystem.ApiException
-import com.gowri.ElectricityBillingSystem.RecievedData
-import com.gowri.ElectricityBillingSystem.UplinkDataToDatabase
-import com.gowri.ElectricityBillingSystem.User
+import com.gowri.ElectricityBillingSystem.*
 import com.gowri.ElectricityBillingSystem.dao.UplinkRepository
 import com.gowri.ElectricityBillingSystem.dao.UserRepository
 import org.slf4j.Logger
@@ -19,12 +16,9 @@ import java.util.*
 class ApiService  {
 
 
-
     @Autowired
     lateinit var uplinkRepository: UplinkRepository
-
-    @Autowired
-    lateinit var validationService: ValidationService
+    
 
     @Autowired
     lateinit var userRepository: UserRepository
@@ -34,6 +28,11 @@ class ApiService  {
 
     fun saveMeterDataToRepository(data: RecievedData){
         uplinkRepository.insertUplink(UplinkDataToDatabase(data.devEUI,data.data))
+
+    }
+
+    fun getMeterDataFromRepository(devEUI: String): MutableList<getUplinkDataFromDatabase>? {
+        return uplinkRepository.getAllUplinkData(devEUI)
 
     }
 

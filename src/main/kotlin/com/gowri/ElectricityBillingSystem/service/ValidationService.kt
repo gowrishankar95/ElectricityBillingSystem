@@ -6,7 +6,6 @@ import com.gowri.ElectricityBillingSystem.dao.UserRepository
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import java.util.regex.Matcher
 import java.util.regex.Pattern
@@ -46,9 +45,6 @@ class ValidationServiceImpl : ValidationService {
 
     lateinit var matcher: Matcher
 
-
-    @Value("\${system.max-invalid-login-attempt}")
-    lateinit var maxInvalidLoginAttempt: String
 
 
 

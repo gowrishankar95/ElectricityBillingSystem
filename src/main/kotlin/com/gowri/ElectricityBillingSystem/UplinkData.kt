@@ -41,3 +41,7 @@ data class User(
 data class getNumberOfUnitsConsumedForCurrentMonth(
         val devEUI: String
 )
+
+data class devEUI(
+        val devEUI: String
+)
