@@ -10,13 +10,16 @@ import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.PreparedStatementCreator
 import org.springframework.jdbc.support.GeneratedKeyHolder
 import org.springframework.stereotype.Repository
-import java.sql.Connection
-import java.sql.PreparedStatement
-import java.sql.SQLException
-import java.sql.Timestamp
+import java.sql.*
 
 @Repository
 class UplinkRepositoryImpl : UplinkRepository {
+
+    override fun getAllUplinkDataForDay(devUI: String, date: Date): MutableList<getUplinkDataFromDatabase>? {
+        val sql = ("SELECT * "
+                + "FROM uplink" + " where devEUI = " + "\'" + devUI + "\'" +  " AND Cast(uploadedTime as Date ) = " + "\'" + date + "\'"+"ORDER BY uploadedTime DESC")
+        return jdbcTemplate?.query(sql, UplinkMapper())
+    }
 
 
     internal var logger = LoggerFactory.getLogger(this.javaClass)

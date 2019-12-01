@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import java.util.regex.Matcher
 import java.util.regex.Pattern
+import org.springframework.security.crypto.factory.PasswordEncoderFactories
 
 
 //todo: java doc is needed
@@ -24,7 +25,7 @@ interface ValidationService {
     /**
      * Validate login Api
      */
-    //fun validateLogin(username: String, passowrd: String)
+    fun validateLogin(username: String, passowrd: String)
 
 }
 
@@ -52,47 +53,27 @@ class ValidationServiceImpl : ValidationService {
 
 
 
-//    override fun validateLogin(username: String, passowrd: String) {
-//        validateUsername(username)
-//        val user = userRepository.findByUsername(username)
-//        val userEmail = userRepository.findByEmail(username)
-//
-//        if (user == null && userEmail == null) {
-//            throw ApiException(ErrorCode.INVALID_USERNAME.id, ErrorCode.INVALID_USERNAME.msg,
-//                    "Error occurred while validating logged in [ username : $username ]")
-//        }
-//
-//        if (user != null) {
-//            validateUserAccount(user)
-//            validateLoginPassword(user, passowrd)
-//        } else if (userEmail != null) {
-//            validateUserAccount(userEmail)
-//            validateLoginPassword(userEmail, passowrd)
-//        }
-//    }
-//
-//    private fun validateLoginPassword(user: User, password: String) {
-//        if (password.isEmpty() || ! PasswordEncoderFactories.createDelegatingPasswordEncoder()
-//                        .matches(password, user.password))
-//            if (user.tempPassword != null) {
-//                if (! PasswordEncoderFactories
-//                                .createDelegatingPasswordEncoder().matches(password, user.tempPassword)) {
-//                    userRepository.updateInvalidLoginAtemps(user.username, user.invalidLoginAttempt + 1)
-//                    throw ApiException(ErrorCode.INVALID_PASSWORD.id, ErrorCode.INVALID_PASSWORD.msg,
-//                            "Error occurred while validating logged in user's password")
-//                }
-//            } else {
-//                userRepository.updateInvalidLoginAtemps(user.username, user.invalidLoginAttempt + 1)
-//                throw ApiException(ErrorCode.INVALID_PASSWORD.id, ErrorCode.INVALID_PASSWORD.msg,
-//                        "Error occurred while validating logged in user's password")
-//            }
-//
-//        if (! PasswordEncoderFactories.createDelegatingPasswordEncoder()
-//                        .matches(password, user.password) &&
-//                user.sessionTime != null && user.lastPwdResetTimestamp != null) {
-//            validateTemPasTimestamp(user, user.sessionTime, user.lastPwdResetTimestamp)
-//        }
-//    }
+    override fun validateLogin(email: String, passowrd: String) {
+        val user = userRepository.findByEmail(email)
+
+        if (user == null) {
+            throw ApiException("1024", "Invalid Email",
+                    "user does not exist")
+        }
+
+        if (user != null) {
+            validateLoginPassword(user, passowrd)
+        }
+    }
+
+    private fun validateLoginPassword(user: User, password: String) {
+        if (password.isEmpty() || !PasswordEncoderFactories.createDelegatingPasswordEncoder()
+                        .matches(password, user.password))
+
+            throw ApiException("1025", "Invalid Password",
+                    "Error occurred while validating logged in user's password")
+
+    }
 
 
     override fun validateRegistrationRequest(request: User) {

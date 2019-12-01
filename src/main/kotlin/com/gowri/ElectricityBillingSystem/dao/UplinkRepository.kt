@@ -2,6 +2,7 @@ package com.gowri.ElectricityBillingSystem.dao
 
 import com.gowri.ElectricityBillingSystem.UplinkDataToDatabase
 import com.gowri.ElectricityBillingSystem.getUplinkDataFromDatabase
+import java.sql.Date
 import java.sql.Timestamp
 
 interface UplinkRepository {
@@ -20,5 +21,7 @@ interface UplinkRepository {
     abstract fun getFirstUplinkDataAfterGivenTimeStamp(devUI: String,timstamp: Timestamp): String?
 
     abstract fun getAllUplinkData(devUI: String): MutableList<getUplinkDataFromDatabase>?
+
+    abstract fun getAllUplinkDataForDay(devUI: String,date: Date): MutableList<getUplinkDataFromDatabase>?
 
 }

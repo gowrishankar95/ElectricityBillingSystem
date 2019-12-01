@@ -40,6 +40,7 @@ class HttpSmsSenderConnectorImpl : HttpSmsSenderConnector {
             request.addHeader("Accept", "*/*")
 
             val response = httpConnector.sendRequest(request)
+            println("response from connector"+ response)
             if(response == null){
                 return null
             }

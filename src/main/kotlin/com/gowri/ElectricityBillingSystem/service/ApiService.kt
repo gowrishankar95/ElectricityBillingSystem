@@ -13,12 +13,15 @@ import java.util.*
 
 
 @Service
-class ApiService  {
+class ApiService {
 
 
     @Autowired
     lateinit var uplinkRepository: UplinkRepository
-    
+
+    @Autowired
+    lateinit var dataDecoder: DataDecoder
+
 
     @Autowired
     lateinit var userRepository: UserRepository
@@ -26,8 +29,9 @@ class ApiService  {
 
     private val logger: Logger = LoggerFactory.getLogger(ApiService::class.java)
 
-    fun saveMeterDataToRepository(data: RecievedData){
-        uplinkRepository.insertUplink(UplinkDataToDatabase(data.devEUI,data.data))
+    fun saveMeterDataToRepository(data: RecievedData) {
+        val decodedData = dataDecoder.decodeDataFromDevice(data.data)
+        uplinkRepository.insertUplink(UplinkDataToDatabase(data.devEUI, decodedData))
 
     }
 
@@ -36,103 +40,54 @@ class ApiService  {
 
     }
 
-    fun getNumberOfUnitsConsumedForCurrentMonth(devEUI: String): Long{
-        val lastSavedMeterData  = uplinkRepository.getLastUplinkData(devEUI)
+    fun getMeterDataOfTheDayFromRepository(devEUI: String,date: java.sql.Date): MutableList<getUplinkDataFromDatabase>? {
+        return uplinkRepository.getAllUplinkDataForDay(devEUI,date)
+
+    }
+
+    fun getNumberOfUnitsConsumedForCurrentMonth(devEUI: String): Long {
+        val lastSavedMeterData = uplinkRepository.getLastUplinkData(devEUI)
         val date = Date()
         val currentMonth = date.month
         val year = date.year
-        val timestamp = Timestamp(year,currentMonth,1,0,0,0,0)
-        val meterDataAtStartOfThisMonth = uplinkRepository.getFirstUplinkDataAfterGivenTimeStamp(devEUI,timestamp)
-        if(lastSavedMeterData != null && meterDataAtStartOfThisMonth !=null ){
+        val timestamp = Timestamp(year, currentMonth, 1, 0, 0, 0, 0)
+        val meterDataAtStartOfThisMonth = uplinkRepository.getFirstUplinkDataAfterGivenTimeStamp(devEUI, timestamp)
+        if (lastSavedMeterData != null && meterDataAtStartOfThisMonth != null) {
             val numberOfUnitsConsumed = lastSavedMeterData!!.toLong() - meterDataAtStartOfThisMonth!!.toLong()
             return numberOfUnitsConsumed
-        }
-        else{
+        } else {
             throw ApiException("1002", "INVALID DEV EUI OR NO DATA ",
-                 "Error occurred while calulating number of units for current month")
+                    "Error occurred while calulating number of units for current month")
         }
 
 
     }
 
 
+    fun login(email: String, password: String): LoginResponse {
+        val user = userRepository.findByEmail(email)
 
-//    override fun login(username: String, password: String): LoginResponse {
-//        val currentTime = generateSessionTime(0)
-//        var user = userRepository.findByUsername(username.trim())
-//
-//        if (user == null) {
-//            user = userRepository.findByEmail(username.trim())
-//        }
-//
-//        val userTicket = generateTicket(user?.username.toString(), password)
-//
-//        val isTempLogin = if (user?.password != null) {
-//                              !PasswordEncoderFactories.createDelegatingPasswordEncoder()
-//                                      .matches(password, user?.password)
-//                          } else {
-//                                true
-//                          }
-//
-//        val isFirstTimeLogin = (user?.lastLoginTimestamp == null)
-//        userRepository.updateUserLastLogin(user?.username,
-//                Timestamp(currentTime.year, currentTime.month, currentTime.date,
-//                        currentTime.hour, currentTime.min, currentTime.Sec, 0))
-//
-//        val lastLoginTimeStamp =
-//                if (user?.lastLoginTimestamp != null) {
-//                    val lastLoginTime =
-//                            org.joda.time.DateTime(user.lastLoginTimestamp)
-//                    TimeStamp(
-//                            lastLoginTime.year,
-//                            user.lastLoginTimestamp!!.month + 1,
-//                            user.lastLoginTimestamp!!.date,
-//                            user.lastLoginTimestamp!!.hours,
-//                            user.lastLoginTimestamp!!.minutes,
-//                            user.lastLoginTimestamp!!.seconds
-//                    )
-//                } else {
-//                    null
-//                }
-//
-//        val lastPwdResetTimestamp = if (user?.lastPwdResetTimestamp != null) {
-//            val lastPwdResetTime =
-//                    org.joda.time.DateTime(user.lastPwdResetTimestamp)
-//            TimeStamp(
-//                    lastPwdResetTime.year,
-//                    user.lastPwdResetTimestamp!!.month + 1,
-//                    user.lastPwdResetTimestamp!!.date,
-//                    user.lastPwdResetTimestamp!!.hours,
-//                    user.lastPwdResetTimestamp!!.minutes,
-//                    user.lastPwdResetTimestamp!!.seconds
-//            )
-//        } else {
-//            null
-//        }
-//
-//        val loginResponse = LoginResponse(
-//                userTicket,
-//                lastLoginTimeStamp,
-//                lastPwdResetTimestamp,
-//                isFirstTimeLogin,
-//                isTempLogin
-//        )
-//
-//        logger.info("Successfully received login response [ Login response: {} ]",
-//                loginResponse)
-//        return loginResponse
-//    }
-//
-     fun register(request: User): User {
+
+        val loginResponse = LoginResponse(
+                "id",
+                true
+        )
+
+        logger.info("Successfully received login response [ Login response: {} ]",
+                loginResponse)
+        return loginResponse
+    }
+
+    fun register(request: User): User {
 
         val password = PasswordEncoderFactories.createDelegatingPasswordEncoder().encode(request.password)
 
-        val user = User(null,request.username,request.email,password,request.accountNum,request.devEUI)
+        val user = User(null, request.username, request.email, password, request.accountNum, request.devEUI)
 
         val registrationResponse = userRepository.create(user)
 
         logger.info("Successfully received registration response [ Registration response: {} ]",
-                    registrationResponse)
+                registrationResponse)
 
         return registrationResponse
     }

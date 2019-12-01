@@ -18,14 +18,14 @@ public class UserRepositoryImpl: UserRepository {
 
     override fun findByEmail(email: String): User? {
         val sql = ("SELECT * "
-                + "FROM users" + " where email = " + "\'" + email + "\'")
+                + "FROM User" + " where email = " + "\'" + email + "\'")
         val user = jdbcTemplate!!.query(sql, UserMapper())
-        if (user == null) {
+        if (user == null || user.isEmpty()) {
             logger.warn("user with user email {} does not exist", email)
             return null
         } else {
             logger.warn("returning user")
-            return user[0]
+            return user.get(0)
         }
 
     }
@@ -74,7 +74,7 @@ public class UserRepositoryImpl: UserRepository {
 
     override fun getUser(userId: Int): User? {
         val sql = ("SELECT * "
-                + "FROM users" + " where UserId = " + "\'" + userId + "\'")
+                + "FROM User" + " where UserId = " + "\'" + userId + "\'")
         val user = jdbcTemplate!!.query(sql, UserMapper())
         if (user == null) {
             logger.warn("user with user id {} does not exist", userId)
@@ -87,29 +87,31 @@ public class UserRepositoryImpl: UserRepository {
     }
 
     override fun findByUsername(username: String): User? {
+        println("find by username")
         val sql = ("SELECT * "
-                + "FROM users" + " where username = " + "\'" + username + "\'")
-        val user = jdbcTemplate!!.query(sql, UserMapper())
-        if (user == null) {
+                + "FROM User" + " where username = " + "\'" + username + "\'")
+        val user = jdbcTemplate?.query(sql, UserMapper())
+        println("user"+user.toString())
+        if (user == null || user.isEmpty()) {
             logger.warn("user with user id {} does not exist", username)
             return null
         } else {
             logger.warn("returning user")
-            return user[0]
+            return user.get(0)
         }
 
     }
 
     override fun findByAccountNum(accountNum: String): User? {
         val sql = ("SELECT * "
-                + "FROM users" + " where accountNum = " + "\'" + accountNum + "\'")
+                + "FROM User" + " where accountNum = " + "\'" + accountNum + "\'")
         val user = jdbcTemplate!!.query(sql, UserMapper())
-        if (user == null) {
+        if (user == null || user.isEmpty()) {
             logger.warn("user with user id {} does not exist", accountNum)
             return null
         } else {
             logger.warn("returning user")
-            return user[0]
+            return user.get(0)
         }
 
     }

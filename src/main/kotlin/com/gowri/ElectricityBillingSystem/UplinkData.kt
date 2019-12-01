@@ -1,6 +1,7 @@
 package com.gowri.ElectricityBillingSystem
 
 import java.sql.Timestamp
+import java.util.*
 
 data class RecievedData(
         val applicationID: String,
@@ -13,6 +14,12 @@ data class RecievedData(
         val fPort: String,
         val data:String
 )
+
+data class ReadingObject(
+        val reading: String
+)
+
+
 data class UplinkDataToDatabase(
         val devEUI: String,
         //val uploadedTime: Timestamp,
@@ -20,15 +27,46 @@ data class UplinkDataToDatabase(
 )
 
 data class getUplinkDataFromDatabase(
-        val devEUI: String,
+        //val devEUI: String,
         val uploadedTime: Timestamp,
-        val data:String
+        var data:String
 )
+
+data class getUplinkDataFromDatabaseInteger(
+        //val devEUI: String,
+        val x: Date,
+        var y: Int
+)
+
+data class dayByDayReading(
+        val devEUI: String,
+        val date: Date,
+        var unitsUsed: Int
+)
+
+data class dayByDayReadingResponse(
+        val date: Date,
+        var unitsUsed: Int
+)
+
+data class dayReadingResponse(
+        val content: MutableList<getUplinkDataFromDatabaseInteger>?,
+        val statusCode: String
+
+)
+
+
 
 data class LoraServerLogin(
         val password: String,
         val username:String
 )
+
+data class AdminLogin(
+        val password: String,
+        val user:String
+)
+
 data class User(
         var id: Int?,
         val username: String,
@@ -44,4 +82,9 @@ data class getNumberOfUnitsConsumedForCurrentMonth(
 
 data class devEUI(
         val devEUI: String
+)
+
+data class LoginResponse(
+    val id: String,
+    val success: Boolean
 )

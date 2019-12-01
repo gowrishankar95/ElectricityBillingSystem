@@ -11,14 +11,14 @@ class UserMapper : RowMapper<User> {
     override fun mapRow(resultSet: ResultSet, i: Int): User? {
         try {
 
-            val user = User(resultSet.getInt("UserId"),
-                    resultSet.getString("userName"),
+            val user = User(resultSet.getInt("id"),
+                    resultSet.getString("username"),
                     resultSet.getString("email"),
-                    resultSet.getString("passowrd"),
+                    resultSet.getString("password"),
                     resultSet.getString("accountNum"),
                     resultSet.getString("devEUI"))
 
-
+            println("userinmapper"+ user)
             return user
 
         } catch (e: EmptyResultDataAccessException) {

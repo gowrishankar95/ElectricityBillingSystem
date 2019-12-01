@@ -166,8 +166,9 @@ class HttpConnector {
                 println(entity)
                 if (entity != null) {
                     val response = EntityUtils.toString(entity);
+                    println("response"+ response)
                     logger.debug(String.format("Received sms-guardianAction response [%s]", response));
-
+                    return response
                 } else {
                     return null
                 }
@@ -178,7 +179,7 @@ class HttpConnector {
                 return null
         } finally {
             httpResponse?.close()
-            return null
+
         }
     }
 
